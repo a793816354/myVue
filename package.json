@@ -1,0 +1,22 @@
+{
+  "name": "myvue",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/a793816354/myVue.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/a793816354/myVue/issues"
+  },
+  "homepage": "https://github.com/a793816354/myVue#readme",
+  "dependencies": {
+    "nodemon": "^2.0.15"
+  }
+}
