@@ -1,4 +1,6 @@
 const { getUniqueQueue } = require("./utils/index.js");
+const componentMap = require("./store/index");
+
 
 class Updater {
   queue = [];
@@ -20,9 +22,9 @@ class Updater {
 
     const uniqueQueue = getUniqueQueue(this.queue);
     while (uniqueQueue.length) {
-      uniqueQueue.shift();
+      const vid = uniqueQueue.shift();
       // 消费队列，更新虚拟模板
-      this.updateVm();
+      this.updateVm(vid);
     }
     //清空任务队列
     this.queue = [];
@@ -31,11 +33,22 @@ class Updater {
     this.updateView();
   }
 
-  updateVm() {
-    console.log("更新虚拟模板！");
+  updateVm(vid) {
+    const component = componentMap[vid]
+    const { render } = component
+
+    // 渲染一组数据
+    component.renderHTML = render()
+    // "<p>李莉的 Pug 代码！</p>"
+    console.log('更新组件模版！');
   }
 
   updateView() {
+    const renderHTML = componentMap.map(item => item.renderHTML).join("")
+    try {
+      const target = document.getElementById("vue")
+      target.innerHTML = renderHTML
+    } catch (error) { }
     console.log("更新视图！");
   }
 }
