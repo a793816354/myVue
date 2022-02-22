@@ -38,7 +38,7 @@ const jane = new Component({
   data: {
     name: "jane",
     age: 20,
-    frends: ["jack", "mike"],
+    friends: ["jack", "mike"],
     job: {
       compony: "bat",
       silar: 30,
@@ -51,7 +51,7 @@ const mike = new Component({
   data: {
     name: "mike",
     age: 27,
-    frends: ["jane", "alem"],
+    friends: ["jane", "alem"],
     job: {
       compony: "tmd",
       silar: 40,
@@ -62,8 +62,7 @@ const mike = new Component({
 
 const input = document.getElementById("input")
 input.addEventListener("input", (e) => {
-  jane.data.name = e.target.value
-  jane.data.age++
+  jane.data.friends = e.target.value
 })
 
 
