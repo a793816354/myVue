@@ -1,6 +1,6 @@
 {
   "watch": ["."],
-  "ext": "js,ts,css",
-  "ignore": [],
-  "exec": "node ./index.js"
+  "ext": "js",
+  "ignore": ["bundle.js"],
+  "exec": "browserify index.js -o  bundle.js"
 }

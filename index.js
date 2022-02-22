@@ -3,15 +3,26 @@
 //     1.手动触发（setState）
 //     2.自动触发（对象监听）
 // 此处使用对象监听
+const pug = require('pug');
 const observer = require("./observer.js");
-let vid = 1;
+const updater = require("./updater.js");
+const componentMap = require("./store/index");
+let vid = 0;
 
 class Model {
   constructor(option) {
     this.vid = vid++;
+    componentMap.push(this)
+    updater.notify(this.vid)
 
-    const { data } = option;
+
+    const { data, template } = option;
     this.data = data;
+    this.template = template;
+    // 编译这份代码
+    this.render = pug.compile(template).bind(pug, this.data);
+    this.renderHTML = ''
+
     observer.observe(this.vid, this.data);
   }
 }
@@ -26,29 +37,33 @@ const jane = new Component({
   data: {
     name: "jane",
     age: 20,
-    frends: ["jack", "mike"],
+    friends: ["jack", "mike"],
     job: {
       compony: "bat",
       silar: 30,
     },
   },
+  template: `p 姓名#{name}，年龄#{age}！`
 });
 
 const mike = new Component({
   data: {
     name: "mike",
     age: 27,
-    frends: ["jane", "alem"],
+    friends: ["jane", "alem"],
     job: {
       compony: "tmd",
       silar: 40,
     },
   },
+  template: `p 工作#{job.compony}，工资#{job.silar}！`
 });
 
-jane.data.age = 22;
-jane.data.job.compony = "ms";
-mike.data.job.silar = 35;
+const input = document.getElementById("input")
+input.addEventListener("input", (e) => {
+  jane.data.name = e.target.value
+})
+
 
 // 更新虚拟模板！
 // 更新虚拟模板！
