@@ -9,9 +9,11 @@ const updater = require("./updater.js");
 const componentMap = require("./store/index");
 let vid = 0;
 
-class Model {
+class Vue {
   constructor(option) {
     this.vid = vid++;
+    this._isVue = true
+
     componentMap.push(this)
     updater.notify(this.vid)
 
@@ -27,7 +29,7 @@ class Model {
   }
 }
 
-class Component extends Model {
+class Component extends Vue {
   constructor(option) {
     super(option);
   }
