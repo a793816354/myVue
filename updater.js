@@ -19,7 +19,6 @@ class Updater {
     if (!this.queue.length) return;
 
     const uniqueQueue = getUniqueQueue(this.queue);
-
     while (uniqueQueue.length) {
       uniqueQueue.shift();
       // 消费队列，更新虚拟模板

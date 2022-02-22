@@ -50,8 +50,6 @@ jane.data.age = 22;
 jane.data.job.compony = "ms";
 mike.data.job.silar = 35;
 
-// key:weather
-// key:name
+// 更新虚拟模板！
 // 更新虚拟模板！
 // 更新视图！
-// 注意：因为以组件为单位渲染，所以队列中只有一次更新虚拟模板

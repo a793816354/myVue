@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/a793816354/myVue#readme",
   "dependencies": {
-    "nodemon": "^2.0.15"
+    "nodemon": "^2.0.15",
+    "vue-template-compiler": "^2.6.14"
   }
 }

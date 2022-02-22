@@ -8,12 +8,14 @@ class Observer {
       // 遍历当前state的每个属性，修改其setter，getter
       if (Object.hasOwnProperty.call(data, key)) {
         // 外部获取值，若在getter内部获取则触发死循环
-        const value = data[key];
+
+        let curVal = data[key]
         Reflect.defineProperty(data, key, {
           get: () => {
-            return value;
+            return curVal;
           },
           set: (val) => {
+            curVal = val
             // 通知vm更新视图
             updater.notify(vid);
           },
