@@ -9,22 +9,46 @@ const updater = require("./updater.js");
 const componentMap = require("./store/index");
 let vid = 0;
 
+const initLifecycle = function () {
+  this.$children = [];
+  this.$refs = {};
+
+  this._watcher = null;
+  this._inactive = null;
+  this._directInactive = false;
+  this._isMounted = false;
+  this._isDestroyed = false;
+  this._isBeingDestroyed = false;
+};
+
+const initState = function () {
+  const { data, template } = this.$options;
+  this.data = data;
+  this.template = template;
+  // 编译这份代码
+  this.render = pug.compile(template).bind(pug, this.data);
+  this.renderHTML = "";
+
+  observer.observe(this.vid, this.data);
+};
+
+const execHook = function (hook) {
+  console.log(hook);
+};
+
 class Vue {
+  vid = vid++;
+  _isVue = true;
   constructor(option) {
-    this.vid = vid++;
-    this._isVue = true;
-
     componentMap.push(this);
+    this.$options = option;
+    initLifecycle.call(this);
+    execHook.call(this, "beforeCreate");
+    initState.call(this);
+    execHook.call(this, "created");
+
     updater.notify(this.vid);
-
-    const { data, template } = option;
-    this.data = data;
-    this.template = template;
-    // 编译这份代码
-    this.render = pug.compile(template).bind(pug, this.data);
-    this.renderHTML = "";
-
-    observer.observe(this.vid, this.data);
+    execHook.call(this, "mounted");
   }
 }
 

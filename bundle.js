@@ -2031,22 +2031,46 @@ const updater = require("./updater.js");
 const componentMap = require("./store/index");
 let vid = 0;
 
+const initLifecycle = function () {
+  this.$children = [];
+  this.$refs = {};
+
+  this._watcher = null;
+  this._inactive = null;
+  this._directInactive = false;
+  this._isMounted = false;
+  this._isDestroyed = false;
+  this._isBeingDestroyed = false;
+};
+
+const initState = function () {
+  const { data, template } = this.$options;
+  this.data = data;
+  this.template = template;
+  // 编译这份代码
+  this.render = pug.compile(template).bind(pug, this.data);
+  this.renderHTML = "";
+
+  observer.observe(this.vid, this.data);
+};
+
+const execHook = function (hook) {
+  console.log(hook);
+};
+
 class Vue {
+  vid = vid++;
+  _isVue = true;
   constructor(option) {
-    this.vid = vid++;
-    this._isVue = true;
-
     componentMap.push(this);
+    this.$options = option;
+    initLifecycle.call(this);
+    execHook.call(this, "beforeCreate");
+    initState.call(this);
+    execHook.call(this, "created");
+
     updater.notify(this.vid);
-
-    const { data, template } = option;
-    this.data = data;
-    this.template = template;
-    // 编译这份代码
-    this.render = pug.compile(template).bind(pug, this.data);
-    this.renderHTML = "";
-
-    observer.observe(this.vid, this.data);
+    execHook.call(this, "mounted");
   }
 }
 
@@ -49166,7 +49190,6 @@ module.exports = componentMap
 const { getUniqueQueue } = require("./utils/index.js");
 const componentMap = require("./store/index");
 
-
 class Updater {
   queue = [];
   /**
@@ -49184,17 +49207,17 @@ class Updater {
 
   update() {
     if (!this.queue.length) return;
-    let flag = false
+    let flag = false;
 
     const uniqueQueue = getUniqueQueue(this.queue);
     while (uniqueQueue.length) {
       // 消费队列，更新虚拟模板
       const vid = uniqueQueue.shift();
-      const component = componentMap[vid]
+      const component = componentMap[vid];
 
-      const oldHTML = component.renderHTML
+      const oldHTML = component.renderHTML;
       this.updateVm(component);
-      if (oldHTML !== component.renderHTML) flag = true
+      if (oldHTML !== component.renderHTML) flag = true;
     }
     //清空任务队列
     this.queue = [];
@@ -49204,19 +49227,21 @@ class Updater {
   }
 
   updateVm(component) {
-    const { render } = component
+    const { render } = component;
     // 渲染一组数据
-    component.renderHTML = render()
+    component.renderHTML = render();
     // "<p>李莉的 Pug 代码！</p>"
-    console.log('更新组件模版！');
+    console.log("更新组件模版！");
   }
 
   updateView() {
-    const renderHTML = componentMap.map(item => item.renderHTML).join("")
+    // execHook.call(this, "beforeMount");
+
+    const renderHTML = componentMap.map((item) => item.renderHTML).join("");
     try {
-      const target = document.getElementById("vue")
-      target.innerHTML = renderHTML
-    } catch (error) { }
+      const target = document.getElementById("vue");
+      target.innerHTML = renderHTML;
+    } catch (error) {}
     console.log("更新视图！");
   }
 }
