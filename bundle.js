@@ -2025,6 +2025,24 @@ process.umask = function() { return 0; };
 //     1.手动触发（setState）
 //     2.自动触发（对象监听）
 // 此处使用对象监听
+
+// 初始化各种参数
+// 执行beforeCreate
+// 初始化state
+// 执行created
+// 获取目标元素
+// 执行beforeMount
+// 添加监听Watcher（监听执行updateComponent）？
+// Watcher构造器执行了一遍updateComponent，渲染组件
+// 执行mounted
+
+// observe：监听对象get，set，通知dep.notify
+// dep：收集与改属性相关的组件，比如一个属性传给了三个组件，则都要收集起来
+// watcher：每个dep的虚拟模板更新（推入队列，nextTick消费）
+
+// 他们的关系：
+// observe监听对象，对象中每个属性的get收集dep为列表，set则广播dep，使其执行watcher的update
+
 const pug = require("pug");
 const observer = require("./observer.js");
 const updater = require("./updater.js");
@@ -2043,14 +2061,19 @@ const initLifecycle = function () {
   this._isBeingDestroyed = false;
 };
 
-const initState = function () {
-  const { data, template } = this.$options;
-  this.data = data;
+const initRender = function () {
+  const { template, data } = this.$options;
   this.template = template;
   // 编译这份代码
-  this.render = pug.compile(template).bind(pug, this.data);
+  this.render = pug.compile(template).bind(pug, data);
   this.renderHTML = "";
+};
 
+const initState = function () {
+  // data, methods, props, computed, watch
+
+  const { data } = this.$options;
+  this.data = data;
   observer.observe(this.vid, this.data);
 };
 
@@ -2065,10 +2088,11 @@ class Vue {
     componentMap.push(this);
     this.$options = option;
     initLifecycle.call(this);
+    initRender.call(this);
+
     execHook.call(this, "beforeCreate");
     initState.call(this);
     execHook.call(this, "created");
-
     updater.notify(this.vid);
     execHook.call(this, "mounted");
   }
@@ -49161,13 +49185,19 @@ class Observer {
       if (Object.hasOwnProperty.call(data, key)) {
         // 外部获取值，若在getter内部获取则触发死循环
 
-        let curVal = data[key]
+        let curVal = data[key];
         Reflect.defineProperty(data, key, {
           get: () => {
             return curVal;
           },
           set: (val) => {
-            curVal = val
+            // 两属性相同的情况，即使是NaN也要判断到
+            if (val === curVal || (val !== val && curVal !== curVal)) return;
+
+            curVal = val;
+            // 如果覆盖的是新对象，则同样需要进行监听
+            this.observe(vid, val);
+
             // 通知vm更新视图
             updater.notify(vid);
           },
