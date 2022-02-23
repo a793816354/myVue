@@ -19,16 +19,17 @@ class Updater {
 
   update() {
     if (!this.queue.length) return;
-    let flag = false
+    let flag = false;
 
     const uniqueQueue = getUniqueQueue(this.queue);
     while (uniqueQueue.length) {
       // 消费队列，更新虚拟模板
       const vid = uniqueQueue.shift();
-      const component = componentMap[vid]
-      const oldHTML = component.renderHTML
+      const component = componentMap[vid];
+
+      const oldHTML = component.renderHTML;
       this.updateVm(component);
-      if (oldHTML !== component.renderHTML) flag = true
+      if (oldHTML !== component.renderHTML) flag = true;
     }
     //清空任务队列
     this.queue = [];
@@ -38,19 +39,20 @@ class Updater {
   }
 
   updateVm(component) {
-    const { render } = component
+    const { render } = component;
     // 渲染一组数据
-    component.renderHTML = render()
+    component.renderHTML = render();
     // "<p>李莉的 Pug 代码！</p>"
-    console.log('更新组件模版！');
+    console.log("更新组件模版！");
   }
 
   updateView() {
-    const renderHTML = componentMap.map(item => item.renderHTML).join("")
+    // execHook.call(this, "beforeMount");
+
+    const renderHTML = componentMap.map((item) => item.renderHTML).join("");
     try {
-      execHook.call(this, 'beforeMount')
-      const target = document.getElementById("vue")
-      target.innerHTML = renderHTML
+      const target = document.getElementById("vue");
+      target.innerHTML = renderHTML;
     } catch (error) { }
     console.log("更新视图！");
   }
