@@ -20,6 +20,11 @@
 
 // 他们的关系：
 // observe监听对象，对象中每个属性的get收集dep为列表，set则广播dep，使其执行watcher的update
+// 其中，dep为状态源，watcher为观察者，所以dep收集watcher，广播watcher
+// 观察者模式：
+//   1.观察者主动申请添加到通知列表
+//   2.状态源变更则广播通知列表发送变更
+
 
 const pug = require("pug");
 const observer = require("./observer.js");
