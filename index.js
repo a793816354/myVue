@@ -6,27 +6,36 @@
 const pug = require('pug');
 const observer = require("./observer.js");
 const updater = require("./updater.js");
-const componentMap = require("./store/index");
+const { execHook } = require("./utils/index");
+const componentMap = require("./common/index");
 let vid = 0;
 
+
+
+
 class Vue {
+  vid = vid++
+  _isVue = true
   constructor(option) {
-    this.vid = vid++;
-    this._isVue = true
-
     componentMap.push(this)
-    updater.notify(this.vid)
 
-
+    execHook.call(this, 'beforeCreate')
     const { data, template } = option;
     this.data = data;
     this.template = template;
     // 编译这份代码
     this.render = pug.compile(template).bind(pug, this.data);
     this.renderHTML = ''
+    execHook.call(this, 'created')
 
     observer.observe(this.vid, this.data);
+    updater.notify(this.vid)
+    execHook.call(this, 'mounted')
   }
+}
+
+Vue.prototype.initLifecycle = function () {
+  this._isMounted = false
 }
 
 class Component extends Vue {

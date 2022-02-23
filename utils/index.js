@@ -10,6 +10,11 @@ const getUniqueQueue = (arr) => {
   return result;
 };
 
+const execHook = function (hook) {
+
+}
+
 module.exports = {
   getUniqueQueue,
+  execHook
 };

@@ -1,6 +1,6 @@
 const { getUniqueQueue } = require("./utils/index.js");
-const componentMap = require("./store/index");
-
+const componentMap = require("./common/index");
+const { execHook } = require("./utils/index");
 
 class Updater {
   queue = [];
@@ -26,7 +26,6 @@ class Updater {
       // 消费队列，更新虚拟模板
       const vid = uniqueQueue.shift();
       const component = componentMap[vid]
-
       const oldHTML = component.renderHTML
       this.updateVm(component);
       if (oldHTML !== component.renderHTML) flag = true
@@ -49,6 +48,7 @@ class Updater {
   updateView() {
     const renderHTML = componentMap.map(item => item.renderHTML).join("")
     try {
+      execHook.call(this, 'beforeMount')
       const target = document.getElementById("vue")
       target.innerHTML = renderHTML
     } catch (error) { }
